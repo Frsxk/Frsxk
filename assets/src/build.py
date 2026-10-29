@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 OUT = HERE.parent
 FONT = json.loads((HERE / "font-6x13B.json").read_text())
 
-# palette, built around #ffb8bf
+# Palette built around #ffb8bf.
 PINK = "#ffb8bf"
 PINK_LIGHT = "#ffe4e7"
 PINK_SOFT = "#ffd1d6"
@@ -36,9 +36,6 @@ def f(n):
     return f"{n:.2f}".rstrip("0").rstrip(".")
 
 
-# --------------------------------------------------------------------------- #
-# pixel primitives
-# --------------------------------------------------------------------------- #
 def bitmap_path(rows, x, y, scale):
     """Turn a list of '#'/'.' strings into one path of horizontal runs."""
     d = []
@@ -146,11 +143,8 @@ def write(name, content):
     print(f"  {name:<22} {len(content.encode()) / 1024:6.1f} KB")
 
 
-# --------------------------------------------------------------------------- #
-# header
-# --------------------------------------------------------------------------- #
 def build_header():
-    W, H = 1000, 320
+    W, H = 1000, 220
     rnd = random.Random(1225)
     css = """
 .blob{animation:drift 16s ease-in-out infinite alternate}
@@ -164,8 +158,6 @@ def build_header():
 @keyframes wave{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-10px)}}
 .beat{transform-box:fill-box;transform-origin:center;animation:beat 1.2s ease-in-out infinite}
 @keyframes beat{0%,40%,100%{transform:scale(1)}12%{transform:scale(1.14)}26%{transform:scale(1.04)}}
-.blink{animation:blink 1s steps(1) infinite}
-@keyframes blink{50%{opacity:0}}
 .dash{animation:dash 30s linear infinite}
 @keyframes dash{to{stroke-dashoffset:-400}}
 """
@@ -181,7 +173,6 @@ def build_header():
         '<g clip-path="url(#card)">',
         f'<rect width="{W}" height="{H}" fill="url(#bg)"/>',
     ]
-    # soft drifting light blobs
     for cx, cy, r, col, bx, by in [
         (160, 60, 150, "#fff", 80, 40),
         (860, 260, 170, CREAM, -90, -30),
@@ -195,7 +186,6 @@ def build_header():
         )
     b.append(f'<rect width="{W}" height="{H}" fill="url(#dots)"/>')
 
-    # floating hearts
     for _ in range(18):
         x = rnd.uniform(20, W - 40)
         s = rnd.choice([2, 3, 3, 4, 5])
@@ -207,19 +197,16 @@ def build_header():
         )
         b.append(f'<g class="rise" style="{style}"><path fill="{col}" d="{bitmap_path(SMALL_HEART, x, H + 10, s)}"/></g>')
 
-    # twinkling sparkles
     for x, y, r in [(80, 70, 14), (930, 60, 18), (870, 140, 9), (130, 230, 10), (700, 270, 12),
                     (230, 120, 7), (780, 90, 8), (40, 160, 8), (960, 250, 10), (520, 40, 9)]:
         style = f"--d:{f(rnd.uniform(2.2, 4))}s;--dl:-{f(rnd.uniform(0, 4))}s"
         b.append(f'<path class="tw" style="{style}" fill="#fff" d="{sparkle(x, y, r)}"/>')
 
-    # dashed sticker border
     b.append(
         f'<rect class="dash" x="14" y="14" width="{W - 28}" height="{H - 28}" rx="18" fill="none" '
         'stroke="#fff" stroke-width="3" stroke-dasharray="14 10" stroke-linecap="round" opacity=".75"/>'
     )
 
-    # title: "frisky" + beating soul
     title, scale = "frisky", 10
     tw = text_width(title, scale)
     hs = 9
@@ -243,49 +230,10 @@ def build_header():
         + "</g>"
     )
 
-    # typewriter subtitle, cycling phrases (type -> hold -> backspace)
-    phrases = [
-        "* hi! i'm frsxk, nice to meet you!",
-        "* web dev, bot tamer & tiny game maker",
-        "* currently: in love with frisk <3",
-        "* you are filled with DETERMINATION.",
-    ]
-    sscale, sy = 3, 236
-    plan, t = [], 0.4
-    for p in phrases:
-        times, end = typing_times(p, t, 0.05)
-        hold = end + 2.6
-        back = [hold + i * 0.02 for i in range(len(p))]
-        plan.append((p, times, back))
-        t = back[-1] + 0.5
-    total = t
-    for k, (p, times, back) in enumerate(plan):
-        px = (W - text_width(p, sscale)) / 2
-        cw = ADV * sscale
-        ev = [(tt, (i + 1) * cw) for i, tt in enumerate(times)]
-        ev += [(tt, (len(p) - i - 1) * cw) for i, tt in enumerate(back)]
-        b.append(
-            f'<clipPath id="sub{k}"><rect x="{f(px)}" y="{sy - 4}" height="{GLYPH_H * sscale + 8}" width="0">'
-            f"{discrete_animate('width', ev, total)}</rect></clipPath>"
-            f'<path clip-path="url(#sub{k})" fill="{PLUM}" d="{text_path(p, px, sy, sscale)}"/>'
-        )
-        # cursor follows the typed text while this phrase is active
-        cev = [(times[0] - 0.4, px)] + [(tt, px + w) for tt, w in ev]
-        cev.append((back[-1] + 0.2, -100))
-        if k == 0:
-            cev.append((0, px))
-        b.append(
-            f'<rect class="blink" x="-100" y="{sy + sscale}" width="{sscale * 2}" height="{9 * sscale}" fill="{PLUM}">'
-            f"{discrete_animate('x', cev, total, initial=-100)}</rect>"
-        )
-
     b.append("</g>")
-    write("header.svg", svg(W, H, "".join(b), css, "frisky - hi! i'm frsxk"))
+    write("header.svg", svg(W, H, "".join(b), css, "frisky"))
 
 
-# --------------------------------------------------------------------------- #
-# undertale-style dialogue box
-# --------------------------------------------------------------------------- #
 def wrap(text, width):
     """Undertale wrapping: '* ' bullet, continuation lines indented two spaces."""
     words, lines, cur = text[2:].split(" "), [], "* "
@@ -349,23 +297,33 @@ def build_dialogue():
                 f"{discrete_animate('width', ev, total)}</rect></clipPath>"
                 f'<path clip-path="url(#{cid})" fill="#fff" d="{text_path(ln, x, y, scale)}"/>'
             )
-    # little pink soul in the corner, bobbing
     body.append(
         f'<g class="bob">{heart(W - 66, H - 56, 3, PINK)}</g>'
     )
     write("dialogue.svg", svg(W, H, "".join(body), css, "Undertale-style dialogue box introducing frisky"))
 
 
-# --------------------------------------------------------------------------- #
-# battle HUD + buttons
-# --------------------------------------------------------------------------- #
 def build_hud():
     W, H = 1000, 64
     s = 3
     y = (H - GLYPH_H * s) / 2 + 2
-    css = """
-.hp{animation:hp 7s ease-in-out infinite}
-@keyframes hp{0%,40%,100%{width:174px}48%{width:120px}52%{width:120px}70%{width:174px}}
+    max_hp, min_hp, bar_width = 20, 14, 174
+    timeline = [(0, max_hp), (40, max_hp)]
+    for step in range(1, max_hp - min_hp + 1):
+        timeline.append((40 + 8 * step / (max_hp - min_hp), max_hp - step))
+    timeline.append((52, min_hp))
+    for step in range(1, max_hp - min_hp + 1):
+        timeline.append((52 + 18 * step / (max_hp - min_hp), min_hp + step))
+    timeline.append((100, max_hp))
+    css = ".hp{animation:hp 7s steps(1,end) infinite}\n@keyframes hp{"
+    css += "".join(f"{f(t)}%{{width:{f(bar_width * hp / max_hp)}px}}" for t, hp in timeline)
+    css += "}\n"
+    for value in range(min_hp, max_hp + 1):
+        css += f".hp-{value}{{opacity:{int(value == max_hp)};animation:hp-{value} 7s steps(1,end) infinite}}\n"
+        css += f"@keyframes hp-{value}{{"
+        css += "".join(f"{f(t)}%{{opacity:{int(hp == value)}}}" for t, hp in timeline)
+        css += "}\n"
+    css += """
 .heal{animation:heal 7s steps(1) infinite;opacity:0}
 @keyframes heal{55%{opacity:1}75%{opacity:0}}
 """
@@ -374,11 +332,12 @@ def build_hud():
     b.append(f'<path fill="#fff" d="{text_path("LV 1", 230, y, s)}"/>')
     b.append(f'<path fill="#fff" d="{text_path("HP", 420, y, s)}"/>')
     bar_x, bar_y = 480, y + 2
-    b.append(f'<rect x="{bar_x}" y="{f(bar_y)}" width="174" height="30" fill="{ROSE}"/>')
-    b.append(f'<rect class="hp" x="{bar_x}" y="{f(bar_y)}" width="174" height="30" fill="{PINK}"/>')
-    b.append(f'<path fill="#fff" d="{text_path("20 / 20", 690, y, s)}"/>')
+    b.append(f'<rect x="{bar_x}" y="{f(bar_y)}" width="{bar_width}" height="30" fill="{ROSE}"/>')
+    b.append(f'<rect class="hp" x="{bar_x}" y="{f(bar_y)}" width="{bar_width}" height="30" fill="{PINK}"/>')
+    for value in range(min_hp, max_hp + 1):
+        b.append(f'<path class="hp-{value}" fill="#fff" d="{text_path(f"{value} / {max_hp}", 690, y, s)}"/>')
     b.append(f'<g class="heal"><path fill="{PINK}" d="{text_path("+love", 870, y, s)}"/></g>')
-    write("hud.svg", svg(W, H, "".join(b), css, "frisky  LV 1  HP 20/20"))
+    write("hud.svg", svg(W, H, "".join(b), css, "frisky  LV 1  HP drops from 20/20 to 14/20, then +love heals to full"))
 
 
 ICONS = {
@@ -433,7 +392,7 @@ def build_buttons():
     names = list(ICONS)
     for k, name in enumerate(names):
         a, z = k * 25, (k + 1) * 25
-        # the soul "cursor" hops FIGHT -> ACT -> ITEM -> MERCY, each image owning a quarter of the loop
+        # Each button owns a quarter of the loop, moving the soul cursor across all four images.
         sel_frames = "0%{opacity:0}" if a > 0 else ""
         sel_frames += f"{a}%{{opacity:1}}{z}%{{opacity:0}}100%{{opacity:0}}"
         css = f"""
@@ -465,9 +424,6 @@ def build_buttons():
         write(f"btn-{name.lower()}.svg", svg(W, H, body, css, name))
 
 
-# --------------------------------------------------------------------------- #
-# section titles
-# --------------------------------------------------------------------------- #
 def build_titles():
     W, H = 1000, 84
     s = 3
@@ -509,9 +465,6 @@ def build_titles():
         write(f"title-{slug}.svg", svg(W, H, "".join(b), css, label[2:]))
 
 
-# --------------------------------------------------------------------------- #
-# footer
-# --------------------------------------------------------------------------- #
 def wave_path(width, amp, period, y, height):
     pts = [f"M0 {height}"]
     for x in range(0, width + 1, 10):
@@ -535,7 +488,7 @@ def build_footer():
 @keyframes rise{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-120px);opacity:0}}
 """
     b = []
-    # save point star
+    # Undertale save-point star.
     star = [
         "....##....",
         "....##....",
@@ -558,7 +511,6 @@ def build_footer():
     msg = "* thanks for stopping by! stay determined <3"
     ts = 3
     b.append(f'<path fill="{ROSE}" d="{text_path(msg, (W - text_width(msg, ts)) / 2, 76, ts)}"/>')
-    # little hearts drifting up out of the waves
     for i, x in enumerate([120, 260, 410, 590, 740, 880]):
         b.append(
             f'<g class="rise" style="animation-delay:{i * 0.8}s">'

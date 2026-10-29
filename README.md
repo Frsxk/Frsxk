@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./assets/header.svg" width="100%" alt="frisky - a pink pixel-art banner with floating hearts and a beating soul. hi! i'm frsxk"/>
+<img src="./assets/header.svg" width="100%" alt="frisky - a pink pixel-art banner with floating hearts and a beating soul"/>
 
 <a href="https://frxskie.me"><img src="https://img.shields.io/badge/website-frxskie.me-ffb8bf?style=for-the-badge&logo=googlechrome&logoColor=ffb8bf&labelColor=5a2a3a" alt="website: frxskie.me"/></a>
 <img src="https://img.shields.io/badge/discord-@frxskie-ffb8bf?style=for-the-badge&logo=discord&logoColor=ffb8bf&labelColor=5a2a3a" alt="discord: @frxskie"/>
@@ -12,7 +12,7 @@
 <img src="./assets/title-about.svg" width="100%" alt="about me"/>
 
 <img src="./assets/dialogue.svg" width="100%" alt="* Hi! I'm Frsxk... but you can call me frisky<3 * I make web apps, Discord bots & games. * Mostly TypeScript, plus Python, Dart & Rust. * I'm in love with Frisk. * Currently learning computer science. * Pronouns: she/them... but any pronouns are okay! * Discord: @frxskie - send a friend request! * Really nice to meet you! * (Reading this profile fills you with DETERMINATION.)"/>
-<img src="./assets/hud.svg" width="100%" alt="frisky  LV 1  HP 20/20"/>
+<img src="./assets/hud.svg" width="100%" alt="frisky  LV 1  HP drops from 20/20 to 14/20, then +love heals to full"/>
 
 <a href="https://github.com/Frsxk?tab=repositories" title="FIGHT - browse my repos"><img src="./assets/btn-fight.svg" width="23%" alt="FIGHT - my repositories"/></a>
 <a href="https://frxskie.me" title="ACT - visit my website"><img src="./assets/btn-act.svg" width="23%" alt="ACT - my website"/></a>
